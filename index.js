@@ -36,4 +36,5 @@ app.post("/register", controller.registerUser, (req, res) => {
   res.status(201).send(`User ${username} registered successfully`);
 });
 
+
 app.listen(8010, () => {});
