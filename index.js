@@ -2,7 +2,6 @@ var http = require("http");
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
-
 const controller = require("./controller/homecontroller");
 app.use(express.static("public"));
 
