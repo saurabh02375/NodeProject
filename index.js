@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const controller = require("./controller/homecontroller");
+const appRoutes = require('./routes/approute')
 app.use(express.static("public"));
 
 app.use(bodyParser.json());
@@ -15,6 +16,8 @@ let users = [];
 app.get("/", (req, res) => {
   res.render("home");
 });
+
+app.use('/',appRoutes);
 
 app.get("/register", (req, res) => {
   res.render("register");
