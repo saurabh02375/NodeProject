@@ -80,7 +80,7 @@ const registerUser = async (req, res) => {
       return res.status(400).send({ message: err });
     }
 
-    const { username } = req.body;
+    const { username ,number , email } = req.body;
     const image = req.file;
 
     if (!username) {
@@ -103,9 +103,11 @@ const registerUser = async (req, res) => {
       }
 
       // Insert the new user with the image name
-      await runAsync("INSERT INTO users (username, image) VALUES (?, ?)", [
+      await runAsync("INSERT INTO users (username, image,number,email) VALUES (?, ?)", [
         username,
         image.filename,
+        number,
+        email
       ]);
 
       console.log(`User ${username} registered with image ${image.filename}`);
