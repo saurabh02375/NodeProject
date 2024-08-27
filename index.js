@@ -4,10 +4,12 @@ const bodyParser = require("body-parser");
 const app = express();
 const controller = require("./controller/homecontroller");
 const appRoutes = require('./routes/approute')
-app.use(express.static("public"));
+const cors=require('cors');
 
+app.use(express.static("public"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors())
 
 app.set("view engine", "ejs");
 app.set("views", "./view");
