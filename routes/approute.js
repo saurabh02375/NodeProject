@@ -8,6 +8,7 @@ router.use(express.json());
 router.post('/submit-form', (req, res) => {
     const formData = req.body;
     
+    console.log("custom")
     // Process formData as needed
     console.log('Form data received:', formData);
 
