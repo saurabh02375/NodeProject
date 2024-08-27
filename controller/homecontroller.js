@@ -102,6 +102,9 @@ const registerUser = async (req, res) => {
         return res.status(400).send("Username already taken");
       }
 
+      console.log({
+        username, number, email
+      })
       // Insert the new user with the image name
       await runAsync("INSERT INTO users (username, image,number,email) VALUES (?, ?)", [
         username,
