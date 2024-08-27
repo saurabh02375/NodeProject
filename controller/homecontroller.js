@@ -115,7 +115,6 @@ const registerUser = async (req, res) => {
 
       console.log(`User ${username} registered with image ${image.filename}`);
 
-      // Verify insertion
       const users = await allAsync("SELECT * FROM users");
 
       console.log("Users in database:", users);
