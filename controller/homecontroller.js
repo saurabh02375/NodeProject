@@ -73,7 +73,11 @@ exports.loginUser = async (req, res) => {
     const { username, password } = req.body;
 
     // Find user by username
+<<<<<<< HEAD
     const user = users.find((u) => u.username === username);
+=======
+    const user = await users.find((u) => u.username === username);
+>>>>>>> b9b8cfe (s)
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });

@@ -6,5 +6,8 @@ router.use(express.json());
 
 router.post('/submit-form',  Home.registerUser);
 
+router.post('/login',  Home.loginUser);
+
+
 
 module.exports = router;
