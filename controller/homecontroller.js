@@ -68,6 +68,7 @@ const allAsync = (sql, params) => {
   });
 };
 
+
 exports.loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -109,14 +110,12 @@ exports.registerUser = async (req, res) => {
     }
 
     try {
-      // Check if username already exists
       const row = await getAsync("SELECT username FROM users WHERE username = ?", [username]);
 
       if (row) {
         return res.status(400).send("Username already taken");
       }
 
-      // Insert new user
       await runAsync("INSERT INTO users (username, number, image , email ,password) VALUES (?, ?, ?, ? ,?)", [
         username,
         email,
