@@ -71,23 +71,15 @@ const allAsync = (sql, params) => {
 exports.loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
-
-    // Find user by username
-<<<<<<< HEAD
-    const user = users.find((u) => u.username === username);
-=======
+    const users = await allAsync("SELECT * FROM users");
     const user = await users.find((u) => u.username === username);
->>>>>>> b9b8cfe (s)
-
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Check if password matches
     if (user.password === password) {
 
       const gentokens =  tokenjwt.generateToken
-      // If using JWTs or sessions, you would handle that here
       return res.status(200).json({ token: gentokens ,  message: 'Login successful', userId: user.id });
     } else {
       return res.status(401).json({ message: 'Invalid credentials' });
