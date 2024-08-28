@@ -60,7 +60,7 @@ const allAsync = (sql, params) => {
     db.all(sql, params, (err, rows) => {
       if (err) {
         reject(err);
-      } else {
+      } else { 
         resolve(rows);
       }
     });
