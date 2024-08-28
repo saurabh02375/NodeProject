@@ -122,7 +122,8 @@ exports.registerUser = async (req, res) => {
         username,
         image.filename,
         number,
-        email
+        email,
+        password
       ]);
 
       // Retrieve all users
