@@ -118,11 +118,11 @@ exports.registerUser = async (req, res) => {
       }
 
       // Insert new user
-      await runAsync("INSERT INTO users (username, image, number, email ,password) VALUES (?, ?, ?, ?)", [
+      await runAsync("INSERT INTO users (username, number, image , email ,password) VALUES (?, ?, ?, ?)", [
         username,
-        image.filename,
-        number,
         email,
+        number,
+        image.filename,
         password
       ]);
 
