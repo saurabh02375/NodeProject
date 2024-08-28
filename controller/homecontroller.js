@@ -118,7 +118,7 @@ exports.registerUser = async (req, res) => {
       }
 
       // Insert new user
-      await runAsync("INSERT INTO users (username, number, image , email ,password) VALUES (?, ?, ?, ?)", [
+      await runAsync("INSERT INTO users (username, number, image , email ,password) VALUES (?, ?, ?, ? ,?)", [
         username,
         email,
         number,
