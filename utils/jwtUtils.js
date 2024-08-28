@@ -1,5 +1,4 @@
-const jwt = require('jsonwebtoken');
-
+const jwt =require('jsonwebtoken');
 const JWT_SECRET = 'your_secret_key'; // Use a secure key and store it in an environment variable
 
 // Generate a JWT token
