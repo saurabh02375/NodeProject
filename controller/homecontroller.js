@@ -70,7 +70,9 @@ const allAsync = (sql, params) => {
 
 
 exports.loginUser = async (req, res) => {
+
   try {
+
     const { username, password } = req.body;
     const users = await allAsync("SELECT * FROM users");
     const user = await users.find((u) => u.username === username);
@@ -80,7 +82,7 @@ exports.loginUser = async (req, res) => {
 
     if (user.password === password) {
 
-      const gentokens =  tokenjwt.generateToken
+      const gentokens =  await tokenjwt.generateToken();
       return res.status(200).json({ token: gentokens ,  message: 'Login successful', userId: user.id });
     } else {
       return res.status(401).json({ message: 'Invalid credentials' });
