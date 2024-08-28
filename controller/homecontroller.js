@@ -67,13 +67,38 @@ const allAsync = (sql, params) => {
   });
 };
 
-const registerUser = async (req, res) => {
+exports.loginUser = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Find user by username
+    const user = users.find((u) => u.username === username);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if password matches
+    if (user.password === password) {
+      // If using JWTs or sessions, you would handle that here
+      return res.status(200).json({ message: 'Login successful', userId: user.id });
+    } else {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+exports.registerUser = async (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
       return res.status(400).send({ message: err });
     }
 
-    const { username, number, email } = req.body;
+    const { username, number, email ,password  } = req.body;
     const image = req.file;
 
     if (!username) {
@@ -93,7 +118,7 @@ const registerUser = async (req, res) => {
       }
 
       // Insert new user
-      await runAsync("INSERT INTO users (username, image, number, email) VALUES (?, ?, ?, ?)", [
+      await runAsync("INSERT INTO users (username, image, number, email ,password) VALUES (?, ?, ?, ?)", [
         username,
         image.filename,
         number,
@@ -112,8 +137,4 @@ const registerUser = async (req, res) => {
       res.status(500).send("Internal server error: " + err.message);
     }
   });
-};
-
-module.exports = {
-  registerUser,
 };
