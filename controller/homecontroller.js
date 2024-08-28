@@ -125,7 +125,7 @@ const registerUser = async (req, res) => {
       });
     } catch (err) {
       console.error("Error:", err.message);
-      res.status(500).send("Internal server error");
+      res.status(500).send("Internal server error" + err.message);
     }
   });
 };
