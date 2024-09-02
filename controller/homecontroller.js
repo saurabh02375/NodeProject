@@ -106,61 +106,53 @@ exports.registerUser = async (req, res) => {
 
     const { username, number, email, password } = req.body;
     const image = req.file;
-    let errors = [];
+    let errors = {};
 
     // Validation
-    if (!username) errors.push("Username is required");
-    if (!number) errors.push("Phone number is required");
+    if (!username) errors.username = "Username is required";
+    if (!number) errors.number = "Phone number is required";
     if (!email) {
-      errors.push("Email is required");
+      errors.email = "Email is required";
     } else if (!isEmail(email)) {
-      errors.push("Invalid email format");
+      errors.email = "Invalid email format";
     }
-    if (!password) errors.push("Password is required");
-    if (!image) errors.push("Image is required");
+    if (!password) errors.password = "Password is required";
+    if (!image) errors.image = "Image is required";
 
-    if (errors.length > 0) {
+    if (Object.keys(errors).length > 0) {
       return res.status(400).send({ errors });
     }
 
     try {
-     // Check if username or email already exists
-     const existingUser = await getAsync(
-      "SELECT username, email FROM users WHERE username = ? OR email = ?",
-      [username, email]
-    );
-    
-    if (existingUser) {
-      const conflictMessage = [];
-      if (existingUser.username === username) {
-        conflictMessage.push("Username already taken");
+      // Check if username or email already exists
+      const existingUser = await getAsync(
+        "SELECT username, email FROM users WHERE username = ? OR email = ?",
+        [username, email]
+      );
+      
+      if (existingUser) {
+        if (existingUser.username === username) {
+          errors.username = "Username already taken";
+        }
+        if (existingUser.email === email) {
+          errors.email = "Email already registered";
+        }
+        if (Object.keys(errors).length > 0) {
+          return res.status(400).send({ errors });
+        }
       }
-      if (existingUser.email === email) {
-        conflictMessage.push("Email already registered");
-      }
-      return res.status(400).send({ errors: conflictMessage });
-    }
-
 
       // Hash the password before storing
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Insert new user into the database
-      await runAsync("INSERT INTO users (username, number, image, email, password) VALUES (?, ?, ?, ?, ?)", [
-        username,
-        number,
-        image.filename,
-        email,
-        hashedPassword
-      ]);
+      await runAsync(
+        "INSERT INTO users (username, number, image, email, password) VALUES (?, ?, ?, ?, ?)",
+        [username, number, image.filename, email, hashedPassword]
+      );
 
       // Retrieve all users
       const users = await allAsync("SELECT * FROM users");
-      
-      // Ensure users is an array
-      if (!Array.isArray(users)) {
-        return res.status(500).send({ message: 'Internal server error: Users data is not an array' });
-      }
 
       res.status(201).send({
         message: `User ${username} registered successfully`,
