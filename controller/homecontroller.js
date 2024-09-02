@@ -2,6 +2,9 @@ const db = require("../database/database");
 const multer = require("multer");
 const path = require("path");
 const tokenjwt = require('../utils/jwtUtils');
+const { isEmail } = require('validator'); // Ensure you have validator package installed
+const bcrypt = require('bcrypt'); // Ensure you have bcrypt package installed
+
 
 const storage = multer.diskStorage({
   destination: "./uploads/",
@@ -94,40 +97,70 @@ exports.loginUser = async (req, res) => {
 };
 
 
+
 exports.registerUser = async (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
-      return res.status(400).send({ message: err });
+      return res.status(400).send({ message: `File upload error: ${err.message}` });
     }
 
-    const { username, number, email ,password  } = req.body;
+    const { username, number, email, password } = req.body;
     const image = req.file;
+    let errors = [];
 
-    if (!username) {
-      return res.status(400).send("Username is required");
+    // Validation
+    if (!username) errors.push("Username is required");
+    if (!number) errors.push("Phone number is required");
+    if (!email) {
+      errors.push("Email is required");
+    } else if (!isEmail(email)) {
+      errors.push("Invalid email format");
     }
+    if (!password) errors.push("Password is required");
+    if (!image) errors.push("Image is required");
 
-    if (!image) {
-      return res.status(400).send("Image is required");
+    if (errors.length > 0) {
+      return res.status(400).send({ errors });
     }
 
     try {
-      const row = await getAsync("SELECT username FROM users WHERE username = ?", [username]);
-
-      if (row) {
-        return res.status(400).send("Username already taken");
+     // Check if username or email already exists
+     const existingUser = await getAsync(
+      "SELECT username, email FROM users WHERE username = ? OR email = ?",
+      [username, email]
+    );
+    
+    if (existingUser) {
+      const conflictMessage = [];
+      if (existingUser.username === username) {
+        conflictMessage.push("Username already taken");
       }
+      if (existingUser.email === email) {
+        conflictMessage.push("Email already registered");
+      }
+      return res.status(400).send({ errors: conflictMessage });
+    }
 
-      await runAsync("INSERT INTO users (username, number, image , email ,password) VALUES (?, ?, ?, ? ,?)", [
+
+      // Hash the password before storing
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Insert new user into the database
+      await runAsync("INSERT INTO users (username, number, image, email, password) VALUES (?, ?, ?, ?, ?)", [
         username,
-        email,
         number,
         image.filename,
-        password
+        email,
+        hashedPassword
       ]);
 
       // Retrieve all users
       const users = await allAsync("SELECT * FROM users");
+      
+      // Ensure users is an array
+      if (!Array.isArray(users)) {
+        return res.status(500).send({ message: 'Internal server error: Users data is not an array' });
+      }
 
       res.status(201).send({
         message: `User ${username} registered successfully`,
@@ -135,7 +168,7 @@ exports.registerUser = async (req, res) => {
       });
     } catch (err) {
       console.error("Error:", err.message);
-      res.status(500).send("Internal server error: " + err.message);
+      res.status(500).send({ message: "Internal server error: " + err.message });
     }
   });
 };
